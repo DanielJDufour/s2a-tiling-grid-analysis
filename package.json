@@ -1,0 +1,27 @@
+{
+  "name": "s2a-tiling-grid-analysis",
+  "version": "0.0.0",
+  "description": "Scipts that Analyze the Sentinel 2 Tiling Grid",
+  "main": "index.js",
+  "scripts": {
+    "analyze": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DanielJDufour/s2a-tiling-grid-analysis.git"
+  },
+  "author": "Daniel J. Dufour",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DanielJDufour/s2a-tiling-grid-analysis/issues"
+  },
+  "homepage": "https://github.com/DanielJDufour/s2a-tiling-grid-analysis#readme",
+  "private": true,
+  "devDependencies": {
+    "@tmcw/togeojson": "^3.0.1",
+    "@turf/bbox": "^6.0.1",
+    "@turf/centroid": "^6.0.2",
+    "xmldom": "^0.1.27"
+  }
+}
