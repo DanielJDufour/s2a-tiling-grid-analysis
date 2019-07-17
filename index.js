@@ -26,6 +26,29 @@ function getLetterDesignator(latitude) {
   }
 }
 
+function getPosition(centroidLat, centroidLon, point) {
+  const [ longitude, latitude] = point;
+  if (longitude < centroidLon) {
+    if (latitude < centroidLat) {
+      return 'bottom-left';
+    } else if (latitude > centroidLat) {
+      return 'top-left';
+    } else {
+      return 'latitude on axis';
+    }
+  } else if (longitude > centroidLon) {
+    if (latitude < centroidLat) {
+      return 'bottom-right';
+    } else if (latitude > centroidLat) {
+      return 'top-right';
+    } else {
+      return 'latitude on axis';
+    }
+  } else {
+    console.log("longitude on axis");
+  }
+}
+
 const text = readFileSync('/tmp/S2A_OPER_GIP_TILPAR_MPC__20151209T095117_V20150622T000000_21000101T000000_B00.kml', 'utf8');
 
 const parsed = new DOMParser().parseFromString(text);
@@ -42,7 +65,11 @@ const info = {
   'point': 0,
   'maxY': 0,
   'minY': 0,
-  'total': 0
+  'total': 0,
+  'top-left': 0,
+  'top-right': 0,
+  'bottom-left': 0,
+  'bottom-right': 0
 };
 
 const more = {
@@ -103,7 +130,17 @@ converted.features.forEach(feature => {
 
   const centerPoint = centroid(polygon);
 
+  const centroidLat = centerPoint.geometry.coordinates[1];
+  const centroidLon = centerPoint.geometry.coordinates[0];
+
   const s2aLetter = mgrs.match(/\d+([A-Z])/)[1];
+
+  const order = [
+    getPosition(centroidLat, centroidLon, first),
+    getPosition(centroidLat, centroidLon, second),
+    getPosition(centroidLat, centroidLon, third),
+    getPosition(centroidLat, centroidLon, fourth)
+  ];
 
   if (first[1] <= 84 && first[1] >= -80) {
     info.total++;
@@ -117,21 +154,40 @@ converted.features.forEach(feature => {
     const maxYMatch = getLetterDesignator(maxY) === s2aLetter;
     if (maxYMatch) info.maxY++;
 
-    const centroidLat = centerPoint.geometry.coordinates[1];
     const centroidMatch = getLetterDesignator(centroidLat) === s2aLetter;
     if (centroidMatch) info.centroid++;
 
     const firstMatch = getLetterDesignator(first[1]);
-    if (firstMatch) info.first++;
+    if (firstMatch) {
+      info.first++;
+      const position = getPosition(centroidLat, centroidLon, first);
+      info[position]++;
+    }
+
 
     const secondMatch = getLetterDesignator(second[1]);
-    if (secondMatch) info.second++;
+    if (secondMatch) {
+      info.second++;
+      const position = getPosition(centroidLat, centroidLon, second);
+      info[position]++;
+    }
 
     const thirdMatch = getLetterDesignator(third[1]);
-    if (thirdMatch) info.third++;
+    if (thirdMatch) {
+      info.third++;
+      const position = getPosition(centroidLat, centroidLon, third);
+      info[position]++;
+    }
 
     const fourthMatch = getLetterDesignator(fourth[1]);
-    if (fourthMatch) info.fourth++;
+    if (fourthMatch) {
+      info.fourth++;
+      const position = getPosition(centroidLat, centroidLon, fourth);
+      info[position]++;
+    }
+
+    if (info[order]) info[order]++;
+    else info[order] = 1;
 
     if (mgrs === "50TMK") {
 
